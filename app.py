@@ -108,14 +108,15 @@ def predict_fraud():
                 scaled_features = scaler.transform(features)
                 # Make prediction
                 prediction = model.predict(scaled_features)
+                prediction = np.where(prediction>0.4755,1,0)
+                if prediction[0] == 1:
+                    print(1)
+                else:
+                    print(0)
                 is_fraud = bool(prediction[0])
                 print(f"Model prediction: {is_fraud}")
             except Exception as e:
-                print(f"Error during prediction: {str(e)}")
-                traceback.print_exc()
-                # Fallback
-                is_fraud = amount > 1000
-                print(f"Using fallback prediction: {is_fraud}")
+                return
         else:
             # Fallback logic if model is not available
             is_fraud = amount > 1000
