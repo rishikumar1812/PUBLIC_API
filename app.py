@@ -36,6 +36,14 @@ except Exception as e:
 def hello_world():
     return "Fraud Detection API is running. Send POST requests to /predict endpoint."
 
+@app.route('/health')
+def health_check():
+    return jsonify({
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "model_loaded": model is not None and scaler is not None
+    })
+
 @app.route('/predict', methods=['POST'])
 def predict_fraud():
     try:
@@ -45,8 +53,8 @@ def predict_fraud():
         
         # Check if all required parameters are present
         required_params = ["transaction_amount", "transaction_channel", 
-                           "transaction_payment_mode_anonymous", 
-                           "payment_gateway_bank_anonymous", 
+                           "transaction_payment_mode", 
+                           "payment_gateway_bank", 
                            "payer_browser_anonymous"]
         
         for param in required_params:
@@ -116,7 +124,11 @@ def predict_fraud():
                 is_fraud = bool(prediction[0])
                 print(f"Model prediction: {is_fraud}")
             except Exception as e:
-                return
+                print(f"Error during prediction: {str(e)}")
+                traceback.print_exc()
+                # Fallback
+                is_fraud = amount > 1000
+                print(f"Using fallback prediction: {is_fraud}")
         else:
             # Fallback logic if model is not available
             is_fraud = amount > 1000
