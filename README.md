@@ -1,76 +1,69 @@
 # Fraud Detection API
 
-A Flask API that detects potentially fraudulent transactions based on input parameters and a pre-trained machine learning model.
+This API provides fraud detection capabilities for financial transactions.
 
-## Setup
+## API Endpoints
 
-1. Install the required dependencies:
-```
-pip install -r requirements.txt
-```
+### GET /
+Health check endpoint that returns API status.
 
-2. Ensure you have the model files in your project directory:
-   - `model.pkl` - The trained machine learning model
-   - `scaler.pkl` - The feature scaler used to normalize inputs
+### POST /predict
+Predicts whether a transaction is fraudulent.
 
-3. Run the application:
-```
-python app.py
-```
-
-The API will be available at http://your-ip-address:5000/
-
-## API Usage
-
-### Endpoint: `/predict`
-
-**Method:** POST
-
-**Input Parameters:**
-- `transaction_amount`: Amount of the transaction (numeric)
-- `transaction_channel`: Channel of transaction (1 for web, 2 for mobile)
-  - Web options: 1, web, w, W, WEB, npm, #
-  - Mobile options: 2, mobile, m, M, 5666
-- `transaction_payment_mode_anonymous`: Anonymous payment mode identifier (numeric)
-- `payment_gateway_bank_anonymous`: Anonymous payment gateway/bank identifier (numeric)
-- `payer_browser_anonymous`: Anonymous browser identifier (numeric)
-
-**Example Request:**
+#### Request Format
 ```json
 {
-  "transaction_amount": 1500,
-  "transaction_channel": "web",
-  "transaction_payment_mode_anonymous": 3,
-  "payment_gateway_bank_anonymous": 2,
-  "payer_browser_anonymous": 1
+    "transaction_id": "ANON_287602",
+    "transaction_date": "2024-12-13 11:17:53",
+    "transaction_amount": 199.0,
+    "transaction_channel": "mobile",
+    "transaction_payment_mode": 10,
+    "payment_gateway_bank": 0,
+    "payer_email": "example@email.com",
+    "payer_mobile": "XXXXX967.0",
+    "payer_browser": 517,
+    "payee_id": "ANON_119",
+    "payee_ip": "xxx.xxx.xxx.xxx"
 }
 ```
 
-**Example Response:**
+#### Response Format
 ```json
 {
-  "transaction_id": "7f4c6a9b-1e2d-4b3c-8d5e-6f7a8b9c0d1e",
-  "is_fraud": true
+    "transaction_id": "ANON_287602",
+    "is_fraud": true
 }
 ```
 
-## External Access
+## Deployment
 
-This API is configured to be accessible over the public internet. The server listens on all available network interfaces (0.0.0.0), allowing connections from outside the local machine.
+### Local Development
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-To access the API from another device, use the public IP address of your server:
-```
-http://your-ip-address:5000/predict
-```
+2. Run the server:
+   ```bash
+   python app.py
+   ```
 
-## Note
+### Render Deployment
+1. Push code to GitHub
+2. Create new Web Service on Render
+3. Connect to GitHub repository
+4. Use the following settings:
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
 
-The API requires two pickle files to function correctly:
-- `model.pkl` - The trained model
-- `scaler.pkl` - The feature scaler
+## Required Files
+- model.pkl: Trained machine learning model
+- scaler.pkl: Feature scaler
 
-If these files are missing, the API will still run but will use a fallback logic (flagging transactions over $1000 as potentially fraudulent).
+## Environment Variables
+None required
 
-## Output
-
-JSON output files are stored in the `output` directory with the naming pattern: `transaction_{transaction_id}_{timestamp}.json` 
+## Testing
+Run the test script:
+```bash
+python test.py 
