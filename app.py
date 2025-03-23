@@ -115,25 +115,25 @@ def predict_fraud():
                 # Special conditions for fraud detection based on input parameters
                 if (amount < 200 and payment_mode >= 10) or browser > 500:
                     is_fraud = True
-                    print("Fraud detected based on specific criteria!")
+                    print(f"Fraud detected based on specific criteria! Transaction ID: {transaction_id}")
                 else:
                     is_fraud = bool(prediction[0] > 0.2)  # Lower threshold for fraud detection
-                    print(f"Model prediction: {is_fraud}")
+                    print(f"Model prediction: {is_fraud} for Transaction ID: {transaction_id}")
                 
             except Exception as e:
                 print(f"Error during prediction: {str(e)}")
                 traceback.print_exc()
                 # Fallback logic that ensures fraud detection for specific conditions
                 is_fraud = (amount < 200 and payment_mode >= 10) or browser > 500
-                print(f"Using fallback prediction: {is_fraud}")
+                print(f"Using fallback prediction: {is_fraud} for Transaction ID: {transaction_id}")
         else:
             # Fallback logic if model is not available
             is_fraud = (amount < 200 and payment_mode >= 10) or browser > 500
-            print(f"Model not available, using fallback prediction: {is_fraud}")
+            print(f"Model not available, using fallback prediction: {is_fraud} for Transaction ID: {transaction_id}")
         
-        # Create result dictionary
+        # Create result dictionary with the original transaction_id
         result = {
-            'transaction_id': transaction_id,
+            'transaction_id': transaction_id,  # Using the original transaction_id from input
             'is_fraud': is_fraud
         }
         
