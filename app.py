@@ -42,14 +42,25 @@ def predict_fraud():
         data = request.get_json()
         print(f"Received data: {data}")
         
-        # Check if all required parameters are present
+        # Extract transaction_id first
+        transaction_id = data.get('transaction_id')
+        if not transaction_id:
+            return jsonify({'error': 'Missing required parameter: transaction_id'}), 400
+        
+        print(f"Processing transaction_id: {transaction_id}")
+        
+        # Check for _anonymous suffix in parameters
+        payment_mode_key = 'transaction_payment_mode_anonymous' if 'transaction_payment_mode_anonymous' in data else 'transaction_payment_mode'
+        gateway_bank_key = 'payment_gateway_bank_anonymous' if 'payment_gateway_bank_anonymous' in data else 'payment_gateway_bank'
+        browser_key = 'payer_browser_anonymous' if 'payer_browser_anonymous' in data else 'payer_browser'
+        
+        # Check if required parameters are present
         required_params = [
-            "transaction_id",
             "transaction_amount",
             "transaction_channel",
-            "transaction_payment_mode",
-            "payment_gateway_bank",
-            "payer_browser"
+            payment_mode_key,
+            gateway_bank_key,
+            browser_key
         ]
         
         for param in required_params:
@@ -84,14 +95,11 @@ def predict_fraud():
         
         # Parse and validate remaining parameters
         try:
-            payment_mode = float(data['transaction_payment_mode'])
-            gateway_bank = float(data['payment_gateway_bank'])
-            browser = float(data['payer_browser'])
+            payment_mode = float(data[payment_mode_key])
+            gateway_bank = float(data[gateway_bank_key])
+            browser = float(data[browser_key])
         except ValueError as e:
             return jsonify({'error': f"Invalid numeric parameter: {str(e)}"}), 400
-        
-        # Use the provided transaction_id
-        transaction_id = data['transaction_id']
         
         # Create feature array with explicit numeric values only
         features = np.array([
