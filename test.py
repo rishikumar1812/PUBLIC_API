@@ -15,19 +15,23 @@ except Exception as e:
     local_ip = "127.0.0.1"
 
 # List of URLs to try
-urls = [
-    "http://127.0.0.1:5000/predict",     # Localhost - try this first
-    "http://localhost:5000/predict",      # Localhost by name
-    f"http://{local_ip}:5000/predict"  # Local IP
-]
+urls = ["https://public-api-nh50.onrender.com/predict",
+        f"http://localhost:5000/predict",
+        f"http://{local_ip}:5000/predict"]
 
 # Test data with required parameters
 data = {
-    "transaction_amount": 1200,
-    "transaction_channel": "npm",
-    "transaction_payment_mode_anonymous": 2,
-    "payment_gateway_bank_anonymous": 3,
-    "payer_browser_anonymous": 4
+    "transaction_id": "ANON_287602",
+    "transaction_date": "2024-12-13 11:17:53",
+    "transaction_amount": 199.0,
+    "transaction_channel": "mobile",
+    "transaction_payment_mode": 10,
+    "payment_gateway_bank": 0,
+    "payer_email": "01e539d52a86183530375b04b281abda87d90f30d35c981235bb3220cb21cf51",
+    "payer_mobile": "XXXXX967.0",
+    "payer_browser": 517,
+    "payee_id": "ANON_119",
+    "payee_ip": "b298ae3f549799b26d6f95df25f28388438fe22598f3bff59fbdb489ca9d0ecf"
 }
 
 print(f"Test data: {json.dumps(data, indent=2)}")
@@ -41,14 +45,14 @@ for url in urls:
         try:
             print("Checking if server is running with a GET request...")
             base_url = url.rsplit('/', 1)[0]  # Get the base URL without the endpoint
-            check_response = requests.get(base_url, timeout=2)
+            check_response = requests.get(base_url, timeout=30)  # Increased timeout
             print(f"Server is reachable - Status: {check_response.status_code}")
         except Exception as e:
             print(f"Could not reach server base URL: {str(e)}")
         
-        # Increased timeout to 15 seconds to account for model loading
-        print(f"Sending POST request to {url} with 15 second timeout...")
-        response = requests.post(url, json=data, timeout=15)
+        # Increased timeout to 60 seconds to account for model loading and cold starts
+        print(f"Sending POST request to {url} with 60 second timeout...")
+        response = requests.post(url, json=data, timeout=60)
         
         print(f"Response received - Status code: {response.status_code}")
         print(f"Response content: {response.text}")
