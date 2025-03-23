@@ -42,7 +42,7 @@ render_data["payer_browser_anonymous"] = render_data.pop("payer_browser")
 # URLs to test with their corresponding data formats
 urls = [
     {
-        "url": "https://public-api-nh50.onrender.com/predict",
+        "url": "https://public-api-1-dyza.onrender.com/predict",
         "data": render_data,
         "name": "Render API"
     },
